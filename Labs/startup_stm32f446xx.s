@@ -548,5 +548,6 @@ g_pfnVectors:
    .weak      FMPI2C1_ER_IRQHandler            
    .thumb_set FMPI2C1_ER_IRQHandler,Default_Handler 
 
+   .weak      SystemInit
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/        
  

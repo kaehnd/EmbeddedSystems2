@@ -33,8 +33,3 @@
 		
 	 } //while (1) program loop
  }
-
- void SystemInit(void)
- {
-	 
- }

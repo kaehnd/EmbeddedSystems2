@@ -37,7 +37,6 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 $(wildcard Src/*.c) \
-$(wildcard Src/*.s) \
 
 
 

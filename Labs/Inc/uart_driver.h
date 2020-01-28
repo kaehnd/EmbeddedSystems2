@@ -10,27 +10,19 @@
 
 #include <inttypes.h>
 
-// RCC registers
-#define RCC_APB1ENR (volatile uint32_t*) 0x40023840
-#define RCC_AHB1ENR (volatile uint32_t*) 0x40023830
 
 #define GPIOAEN 0		// GPIOA Enable is bit 0 in RCC_APB1LPENR
 #define USART2EN 17  // USART2 enable is bit 17 in RCC_AHB1LPENR
 
-// GPIOA registers
-#define GPIOA_MODER (volatile uint32_t*) 0x40020000
-#define GPIOA_AFRL  (volatile uint32_t*) 0x40020020
-#define USART_SR    (volatile uint32_t*) 0x40004400
-#define USART_DR    (volatile uint32_t*) 0x40004404
-#define USART_BRR   (volatile uint32_t*) 0x40004408
-#define USART_CR1   (volatile uint32_t*) 0x4000440c
-#define USART_CR2   (volatile uint32_t*) 0x40004410
-#define USART_CR3   (volatile uint32_t*) 0x40004414
+
 
 // CR1 bits
 #define UE 13 //UART enable
+#define TXEIE 7 //TXE interrupt enable
+#define RXNEIE 5 //RXNE Interrupt Enabvle
 #define TE 3  // Transmitter enable
 #define RE 2  // Receiver enable
+
 
 // Status register bits
 #define TXE 7  // Transmit register empty

@@ -20,7 +20,8 @@ static RingBuffer  bufOut = {0, 0};
 
 void USART2_IRQHandler()
 {
-	if (usart2[USART_SR] & (1<<TXE))
+	uint32_t sr = usart2[USART_SR];
+	if (sr & (1<<TXE))
 	{
 		if (hasElement(&bufOut))
 		{
@@ -29,9 +30,10 @@ void USART2_IRQHandler()
 		else 
 		{
 			usart2[USART_CR1] &= ~(1<<TXEIE);
+			usart2[USART_DR] = 0;
 		}
 	}
-	else if (usart2[USART_SR] & (1<<RXNE))
+	if (sr & (1<<RXNE))
 	{
 		char readChar = usart2[USART_DR];
 		//check status of both buffers so what user sees and what happens align

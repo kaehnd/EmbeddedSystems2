@@ -55,8 +55,8 @@
 #define ODR 5
 #define BSRR 6
 #define LCKR 7
-#define AFLR 8
-#define AFHR 9
+#define AFRL 8
+#define AFRH 9
 
 // GPIO Bits
 #define DR0 0
@@ -191,8 +191,18 @@
 #define ISER0 0
 #define ISER1 1
 
-#define USART_2_NVIC_POS
+#define USART_2_NVIC_POS 6
 #define ICPR0 96 //0x180 bytes, 96d 32-bit words
+
+#define USART2_BASE 0x40004400
+
+#define USART_SR 0
+#define USART_DR 1
+#define USART_BRR 2
+#define USART_CR1 3
+#define USART_CR2 4
+#define USART_CR3 5
+#define USART_GTPR 6
 
 
 

@@ -55,8 +55,8 @@
 #define ODR 5
 #define BSRR 6
 #define LCKR 7
-#define AFLR 8
-#define AFHR 9
+#define AFRL 8
+#define AFRH 9
 
 // GPIO Bits
 #define DR0 0

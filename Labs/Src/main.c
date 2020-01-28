@@ -26,10 +26,13 @@
  int main(void)
  {
  	 init_usart2(BAUD_R, F_CPU);
+
+	
  	 ringBufferTests();
 
 	 while (1)
 	 {
 		
 	 } //while (1) program loop
+
  }

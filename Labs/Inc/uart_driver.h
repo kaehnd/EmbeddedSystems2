@@ -18,8 +18,11 @@
 
 // CR1 bits
 #define UE 13 //UART enable
+#define TXEIE 7 //TXE interrupt enable
+#define RXNEIE 5 //RXNE Interrupt Enabvle
 #define TE 3  // Transmitter enable
 #define RE 2  // Receiver enable
+
 
 // Status register bits
 #define TXE 7  // Transmit register empty

@@ -14,7 +14,7 @@
 #define BUF_SIZE 50
 
 //Definition of RingBuffer
-typedef struct {
+typedef struct _ringBuffer {
 	unsigned int put; //index to put at
 	unsigned int get; //index to get from
 	char buffer[BUF_SIZE];

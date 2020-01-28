@@ -13,8 +13,8 @@
 
 static volatile uint32_t * const gpioa = (volatile uint32_t *) GPIOA_BASE;
 static volatile uint32_t * const usart2 = (volatile uint32_t *) USART2_BASE;
-static struct _ringBuffer bufIn = {0, 0};
-static struct _ringBuffer bufOut = {0, 0};
+static  RingBuffer bufIn = {0, 0};
+static  RingBuffer bufOut = {0, 0};
 
 
 
@@ -132,7 +132,7 @@ void init_usart2(uint32_t baud, uint32_t sysclk){
 	 setvbuf(stdout, NULL, _IONBF, 0);
 
 	//enable read interrupt as final step
-	usart2[USART_CR1] |=(RXNEIE);
+	usart2[USART_CR1] |=(1<<RXNEIE);
 	nvic[ISER1] |= (1<<USART_2_NVIC_POS); 
 }
 

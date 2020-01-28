@@ -42,7 +42,7 @@ void speaker_init(void)
 	rcc[APB1ENR] |= 1<<TIM3EN;
 
 	//Enable alternate function 2 for GPIOB pin 4 in AFRL
-	gpiob[AFLR] |= AF2 << AFLR4;
+	gpiob[AFRL] |= AF2 << AFLR4;
 
 	//Enable alternate function in MODER for pin 4
 	gpiob[MODER] |= ALTERNATE<<MODER4;

@@ -2,7 +2,8 @@
  * uart_driver.h
  *
  *  Created on: Nov 8, 2016
- *      Author: barnekow
+ *      Author: kaehnd
+ *      Declarations and prototypes for uart_driver.c
  */
 
 #ifndef UART_DRIVER_H_
@@ -10,11 +11,8 @@
 
 #include <inttypes.h>
 
-
 #define GPIOAEN 0		// GPIOA Enable is bit 0 in RCC_APB1LPENR
 #define USART2EN 17  // USART2 enable is bit 17 in RCC_AHB1LPENR
-
-
 
 // CR1 bits
 #define UE 13 //UART enable
@@ -30,12 +28,11 @@
 
 // Function prototypes
 extern void init_usart2(uint32_t baud, uint32_t sysclk);
-extern char bufGet();
-extern void bufPut(char c);
+static char bufGet();
+static void bufPut(char c);
 
 // syscalls overrides
 int _read(int file, char *ptr, int len);
 int _write(int file, char *ptr, int len);
-
 
 #endif /* UART_DRIVER_H_ */

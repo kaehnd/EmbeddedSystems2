@@ -72,6 +72,7 @@ int _read(int file, char *ptr, int len)
 		*ptr = bufGet();
 		if (*ptr == '\b') 
 		{
+			*ptr = '\0';
 			ptr--;
 			byteCnt --;
 		}

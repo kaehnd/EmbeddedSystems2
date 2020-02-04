@@ -21,9 +21,23 @@
 void put(RingBuffer * buffer, char element)
 {
 	while (!hasSpace(buffer));
+
+
 	buffer->buffer[buffer->put] = element;
-	buffer->put = (buffer->put + 1) % BUF_SIZE;
+	buffer->put = (buffer->put + 1) % BUF_SIZE;	
 }
+
+void putNoBlock(RingBuffer * buffer, char element)
+{
+	if (hasSpace(buffer))
+	{
+		buffer->buffer[buffer->put] = element;
+		buffer->put = (buffer->put + 1) % BUF_SIZE;	
+	}
+	//else drop
+}
+
+
 
 /*
  * Gets the oldest character from specified RingBuffer
@@ -58,6 +72,20 @@ int hasElement(RingBuffer * buffer)
 {
 	return !(buffer->put == buffer->get);
 }
+
+void backSpace(RingBuffer * buffer)
+{
+	if (hasElement(buffer))
+	{
+		buffer->put = (buffer->put -1) % BUF_SIZE;
+		if (buffer->put == -1)
+		{
+			buffer->put = BUF_SIZE;
+		}
+	}
+}
+
+
 
 /***************Tests********************/
 

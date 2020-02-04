@@ -44,6 +44,9 @@ char get(RingBuffer * buffer);
  */
 int hasSpace(RingBuffer * buffer);
 
+void backSpace(RingBuffer * buffer);
+void putNoBlock(RingBuffer * buffer, char element);
+
 /*
  * Returns whether the specified buffer has any element or if it is empty
  * Parameters: RingBuffer * buffer, pointer to RingBuffer struct

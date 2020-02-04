@@ -66,6 +66,7 @@ static void printHelp(char * savePtr);
  int main(void)
  {
  	 init_usart2(BAUD_R, F_CPU);
+
 	 while (1)
 	 {
 		 printf("\nSTM32_Support_Main_Menu: ");

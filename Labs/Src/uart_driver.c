@@ -37,10 +37,20 @@ void USART2_IRQHandler()
 	{
 		char readChar = usart2[USART_DR];
 		//check status of both buffers so what user sees and what happens align
-		if (hasSpace(&bufIn) && hasSpace(&bufOut))
+		if (readChar == '\b')
 		{
-		put(&bufIn, readChar);
-		put(&bufOut, readChar);
+			if (hasSpace(&bufOut))
+			{
+				bufPut('\b');
+				bufPut(' ');
+				bufPut('\b');
+				put(&bufIn, readChar);
+			}
+		}
+		else if (hasSpace(&bufIn) && hasSpace(&bufOut))
+		{
+			put(&bufIn, readChar);		
+			bufPut(readChar); //echo
 		}
 	}
 	
@@ -58,8 +68,9 @@ int _read(int file, char *ptr, int len)
 	{
 		//*ptr++ = __io_getchar();
 		byteCnt++;
-		//*ptr++ = usart2_getch();
-		*ptr = usart2_getch();
+		//*ptr++ = bufGet();
+		*ptr = bufGet();
+		if (*ptr == '\b') ptr--;
 		if(*ptr == '\n') break;
 		ptr++;
 	}
@@ -74,25 +85,23 @@ int _write(int file, char *ptr, int len)
 
 	for (DataIdx = 0; DataIdx < len; DataIdx++)
 	{
-		usart2_putch(*ptr++);
+		bufPut(*ptr++);
 	}
 	return len;
 }
 
 
 
-char usart2_getch(){
+char bufGet(){
 	char c = get(&bufIn);	
-
 	if (c == '\r'){  // If character is CR
-		usart2_putch('\n');  // send it
+		bufPut('\n');  // send it
 		c = '\n';   // Return LF. fgets is terminated by LF
 	}
-
 	return c;
 }
 
-void usart2_putch(char c){
+void bufPut(char c){
 	usart2[USART_CR1] |= (1<<TXEIE);
 	put(&bufOut, c); //will block if full
 }

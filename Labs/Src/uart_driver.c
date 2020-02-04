@@ -16,8 +16,6 @@ static volatile uint32_t * const usart2 = (volatile uint32_t *) USART2_BASE;
 static RingBuffer  bufIn = {0, 0};
 static RingBuffer  bufOut = {0, 0};
 
-
-
 void USART2_IRQHandler()
 {
 	uint32_t sr = usart2[USART_SR];
@@ -98,8 +96,6 @@ int _write(int file, char *ptr, int len)
 	return len;
 }
 
-
-
 char bufGet(){
 	char c = get(&bufIn);	
 	if (c == '\r'){  // If character is CR
@@ -130,10 +126,6 @@ void init_usart2(uint32_t baud, uint32_t sysclk){
 	//Set up interrupt in NVIC
 	volatile uint32_t * const nvic = (volatile uint32_t * const) NVIC_BASE;
 	
-
-
-
-
 	// Set up USART2
 	//USART2_init();  //8n1 no flow control
 	// over8 = 0..oversample by 16

@@ -70,9 +70,16 @@ int _read(int file, char *ptr, int len)
 		byteCnt++;
 		//*ptr++ = bufGet();
 		*ptr = bufGet();
-		if (*ptr == '\b') ptr--;
-		if(*ptr == '\n') break;
-		ptr++;
+		if (*ptr == '\b') 
+		{
+			ptr--;
+			byteCnt --;
+		}
+		else 
+		{
+			if(*ptr == '\n') break;
+			ptr++;
+		}
 	}
 
 	//return len;

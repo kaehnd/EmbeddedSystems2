@@ -82,6 +82,48 @@ void init_usart2(uint32_t baud, uint32_t sysclk) {
 	nvic[ISER1] |= (1<<USART_2_NVIC_POS); 
 }
 
+/*
+ * Handles all USART2 Line interrupts
+ * Writes to DR when TXIE = 1 and there is something in bufOut
+ * Turns off transmit interrupt when output buffer is full
+ * Reads from DR to bufIN when RXE = 1
+ */
+void USART2_IRQHandler()
+{
+	uint32_t sr = usart2[USART_SR];
+	if (sr & (1<<TXE))
+	{
+		if (hasElement(&bufOut))
+		{
+			usart2[USART_DR] = get(&bufOut);
+		}
+		else 
+		{
+			usart2[USART_CR1] &= ~(1<<TXEIE);
+			usart2[USART_DR] = 0;
+		}
+	}
+	if (sr & (1<<RXNE))
+	{
+		char readChar = usart2[USART_DR];
+		//check status of both buffers so what user sees and what happens align
+		if (readChar == '\b')
+		{
+			if (hasSpace(&bufOut))
+			{
+				bufPut('\b');
+				bufPut(' ');
+				bufPut('\b');
+				put(&bufIn, readChar);
+			}
+		}
+		else if (hasSpace(&bufIn) && hasSpace(&bufOut))
+		{
+			put(&bufIn, readChar);		
+			bufPut(readChar); //echo
+		}
+	}
+
 // These will override _read and _write in syscalls.c, which are
 // prototyped as weak
 int _read(int file, char *ptr, int len)

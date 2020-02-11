@@ -29,13 +29,14 @@ static RingBuffer  bufOut = {0, 0};
  */
 static char bufGet();
 
+
 /*
- * Gets from the input ringBuffer
+ * Puts to the output ringBuffer
  * Blocks
- * Parameters: none
- * Returns: char gotten from buffer
+ * Parameters: char to be put to buffer
+ * Returns: none
  */
-static char bufGet();
+static void bufPut(char c);
 
 
 /*
@@ -123,6 +124,7 @@ void USART2_IRQHandler()
 			bufPut(readChar); //echo
 		}
 	}
+}
 
 // These will override _read and _write in syscalls.c, which are
 // prototyped as weak
@@ -172,7 +174,8 @@ int _write(int file, char *ptr, int len)
  * Parameters: none
  * Returns: char gotten from buffer
  */
-static char bufGet(){
+static char bufGet()
+{
 	char c = get(&bufIn);	
 	if (c == '\r'){  // If character is CR
 		bufPut('\n');  // send it
@@ -187,7 +190,8 @@ static char bufGet(){
  * Parameters: char to be put to buffer
  * Returns: none
  */
-static void bufPut(char c){
+static void bufPut(char c)
+{
 	usart2[USART_CR1] |= (1<<TXEIE);
 	put(&bufOut, c); //will block if full
 }

@@ -28,8 +28,7 @@
 
 // Function prototypes
 extern void init_usart2(uint32_t baud, uint32_t sysclk);
-static char bufGet();
-static void bufPut(char c);
+
 
 // syscalls overrides
 int _read(int file, char *ptr, int len);

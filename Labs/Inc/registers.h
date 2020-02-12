@@ -13,6 +13,10 @@
 
 // AHB1ENR and bits
 #define AHB1ENR  12
+#define APB1ENR 16
+#define APB2ENR 17
+
+#define TIM3EN 1
 
 #define GPIOAEN	0
 #define GPIOBEN	1
@@ -29,10 +33,7 @@
 #define OTGHSEN	29
 #define OTGHSULPIEN	30
 
-//APB1ENR
-#define APB1ENR 16
 
-#define TIM3EN 1
 
 
 // GPIO peripherals
@@ -175,7 +176,8 @@
 
 //Timer peripheral bases
 #define TIM3_BASE 0x40000400
-
+#define TIM5_BASE 0x40000C00
+#define TIM8_BASE 0x40010400
 
 
 //Timer registers
@@ -203,6 +205,20 @@
 #define USART_CR2 4
 #define USART_CR3 5
 #define USART_GTPR 6
+
+
+#define ADC1_BASE 0x40012000
+#define ADC_SR 0
+#define ADC_CR1 1
+#define ADC_CR2 2
+#define ADC_SQR3 13
+#define ADC_DR 19
+
+
+#define DAC1_BASE 0x40007400
+#define DAC_CR 0
+#define DAC_SWTRIGR 1
+#define DAC_DHR12R1 2
 
 
 

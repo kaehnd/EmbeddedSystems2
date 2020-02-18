@@ -219,6 +219,28 @@
 #define DAC_CR 0
 #define DAC_SWTRIGR 1
 #define DAC_DHR12R1 2
+#define DAC_DHR12R2 5
+
+
+//External interrupt values
+#define EXTI_BASE 0x40013C00
+#define EXTI_IMR 0
+#define EXTI_FTSR 3
+#define EXTI_PR 5
+
+//sytem config values
+#define SYSCFG_BASE 0x40013800
+#define SYSCFG_MEMRMP 0
+#define SYSCFG_PMC 1
+#define SYSCFG_EXTICR1 2
+#define SYSCFG_EXTICR2 3
+#define SYSCFG_EXTICR3 4
+#define SYSCFG_EXTICR4 5
+#define SYSCFG_CMPCR 6
+#define SYSCFG_CFGR 7
+
+
+
 
 
 

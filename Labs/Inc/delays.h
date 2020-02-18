@@ -25,6 +25,8 @@
 #define STK_ENABLE 1 <<0
 #define STK_CLKSRC 1<<2
 
+void startDelay_s(uint32_t s);
+int pollStk();
 
 
 void delay_s(uint32_t s);

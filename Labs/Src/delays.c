@@ -33,6 +33,22 @@ void delay_s(uint32_t s)
 	delayTicks(s * TICKS_S);
 }
 
+void startDelay_s(uint32_t s)
+{
+		//Clear vals
+	stk[STK_CTRL] = 0;
+	stk[STK_LOAD] = 0;
+	stk[STK_VAL] = 0;
+
+	stk[STK_LOAD] = s * TICKS_S;
+	stk[STK_CTRL] |= (STK_ENABLE|STK_CLKSRC);
+}
+
+int pollStk()
+{
+	return (stk[STK_CTRL] & STK_CNTFLAG);
+}
+
 /*
  * ***BLOCKS***
  * Delays ms amount of milliseconds using Systick timer
@@ -73,3 +89,5 @@ static void delayTicks(uint32_t ticks)
 	//Loop until count flag goes high
 	while (!(stk[STK_CTRL] & STK_CNTFLAG)) {}
 }
+
+

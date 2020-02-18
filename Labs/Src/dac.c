@@ -27,10 +27,10 @@ void dac_init()
    
 
     //CR1
-    dac1[DAC_CR] |= 0b111 << 3; //TSEL1 to SWTRGR
-    dac1[DAC_CR] |= 1 <<2; //TEN1 enable channel 1
+   // dac1[DAC_CR] |= 0b111 << 3; //TSEL1 to SWTRGR
+   // dac1[DAC_CR] |= 1 <<2; //TEN1 enable channel 1
     dac1[DAC_CR] |= 1<<0; //EN1 DAC CH1 Enable
-
+    //dac1[DAC_CR] |= 1<<16; //EN2 CH2 Enable
   
 
 }
@@ -38,6 +38,8 @@ void dac_init()
 void dac_put(uint16_t value)
 {
     
-    dac1[DAC_DHR12R1] = value;
-    dac1[DAC_SWTRIGR] = 1;
+    dac1[DAC_DHR12R1] = value; //CH1 HOLDING REG
+   // dac1[DAC_SWTRIGR] = 1;
+
+ //   dac1[DAC_DHR12R2] = value; //CH2 HOLDING REG
 }

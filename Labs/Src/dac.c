@@ -16,30 +16,26 @@
 
 static volatile uint32_t * const dac1 = (volatile uint32_t *) DAC1_BASE;
 
-void dac_init()
+/*
+ * Initializes DAC1 for output
+ * Parameters: None
+ * Returns: None
+ */
+void dac_init(void)
 {
-    
-    //Using Pin A4
-
      //RCC DAC
     volatile uint32_t * const rcc = (volatile uint32_t *) RCC_BASE;
-    rcc[APB1ENR] |= 1<<29; //DACEN
+    rcc[APB1ENR] |= 1<<DACEN; //DACEN
    
-
-    //CR1
-   // dac1[DAC_CR] |= 0b111 << 3; //TSEL1 to SWTRGR
-   // dac1[DAC_CR] |= 1 <<2; //TEN1 enable channel 1
-    dac1[DAC_CR] |= 1<<0; //EN1 DAC CH1 Enable
-    //dac1[DAC_CR] |= 1<<16; //EN2 CH2 Enable
-  
-
+    dac1[DAC_CR] |= 1<<DACEN1; //EN1 DAC CH1 Enable
 }
 
+/*
+ * Puts sample to DAC 0-4095 corresponding to 0-3.3V
+ * Parameters: uint16_t 12-bit value 0<value<4095
+ * Returns: None
+ */
 void dac_put(uint16_t value)
 {
-    
     dac1[DAC_DHR12R1] = value; //CH1 HOLDING REG
-   // dac1[DAC_SWTRIGR] = 1;
-
- //   dac1[DAC_DHR12R2] = value; //CH2 HOLDING REG
 }

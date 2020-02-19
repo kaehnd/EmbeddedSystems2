@@ -8,16 +8,19 @@
 #ifndef REGISTERS_H_
 #define REGISTERS_H_
 
+#define SYS_CLK 16000000
+
 // RCC Peripheral
 #define RCC_BASE 0x40023800
 
-// AHB1ENR and bits
+// RCC Regs
 #define AHB1ENR  12
 #define APB1ENR 16
 #define APB2ENR 17
 
 #define TIM3EN 1
 
+//AHB1ENR
 #define GPIOAEN	0
 #define GPIOBEN	1
 #define GPIOCEN	2
@@ -33,7 +36,13 @@
 #define OTGHSEN	29
 #define OTGHSULPIEN	30
 
+//APB2ENR
+#define ADCEN 8
+#define SYSCFGEN 14
 
+//APB1ENR
+#define TIM5EN 3
+#define DACEN 29
 
 
 // GPIO peripherals

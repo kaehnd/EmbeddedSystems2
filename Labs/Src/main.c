@@ -1,53 +1,128 @@
 /*
  * main.c
  *
- *  Created on: Jan 18, 2019
+ *  Created on: Feb 19, 2019
  *      Author: Daniel Kaehn
  *      Class: CE 2812-021
- *      Assignment: Lab 4: LCD and Keypad API
+ *      Assignment: Lab 9: Guitar Effects Processor
  *
- *      Implements a service menu for console interaction with STM32 board memory
+ *      Implements a sample-by-sample guitar signal processor using adc and dac
  */
 
 #include <stdio.h>
 
-
-
-
 #include "registers.h"
-#include "uart_driver.h"
 #include "adc.h"
 #include "dac.h"
-#include "leds.h"
-
-#include "lcd.h"
-#include "delays.h"
 
 //system values
-#define F_CPU 16000000UL
-#define BAUD_R 19200
+#define FREQ_RANGE 4000
+#define SAMPLE_RATE 41000
 
-#define FREQ_RANGE 4095
+//EXTI definitions
+#define EXTICR13 4
+#define EXTICR_CBANK 0b0010
+#define EXTI13 13
+#define EXTI_15_10_NVIC 8
 
 static volatile uint32_t * const gpioc = (volatile uint32_t *) GPIOC_BASE;
-
 volatile uint32_t * const exti = (volatile uint32_t *) EXTI_BASE;
 
-
+//Flag for distortion enable
 static int distEn = 0;
 
+/*
+ * Implements simple distortion on sample voltage ratio a 
+ * Parameters: unsigned int a, sample voltage in, such that 0<a<FREQ_RANGE
+ * Returns: unsigned int, sample voltage out
+ */
+unsigned int simple_distort(unsigned int a);
+
+/*
+ * Initializes blue button with external interrupts
+ * Parameters: None
+ * Returns: None
+ */ 
+void blueButton_init_IT(void);
+
+/*
+ * Initializes pins for guitar input and output
+ * Parameters: none
+ * Returns: none
+ */
+static void guitarIO_init(void);
 
 
-static void guitarIn_init()
+/*
+ * Main program entry
+ */
+ int main(void)
+ {
+	 adc_init(SAMPLE_RATE);
+	 dac_init();
+	 guitarIO_init();
+	 blueButton_init_IT();
+	 while (1)
+	 {
+		int sample = adc_getData();  //Input
+	
+		if (distEn)
+		{
+			sample = simple_distort(sample);
+		}
+		dac_put(sample); //Output
+	 } //while (1) program loop
+ }
+
+
+
+/*
+ * Initializes pins for guitar input and output
+ * Parameters: none
+ * Returns: none
+ */
+static void guitarIO_init(void)
 {
 	volatile uint32_t * const rcc = (volatile uint32_t *) RCC_BASE;
 	volatile uint32_t * const gpioa = (volatile uint32_t *) GPIOA_BASE;
-	rcc[AHB1ENR] |= 1<<0;
+	rcc[AHB1ENR] |= 1<<GPIOAEN;
 	gpioa[MODER] |= ANALOG << MODER0;
 	gpioa[MODER] |= ANALOG << MODER5;
-
 }
 
+/*
+ * Initializes blue button with external interrupts
+ * Parameters: None
+ * Returns: None
+ */ 
+void blueButton_init_IT(void)
+{
+	volatile uint32_t * const rcc = (volatile uint32_t *) RCC_BASE;
+	rcc[APB2ENR] |= 1<<SYSCFGEN; //SYSCFGEN
+	rcc[AHB1ENR] |= 1<<GPIOCEN; //GPIOCEN
+	
+	gpioc[MODER] &= ~(11<<MODER13);
+	gpioc[MODER] |= (INPUT<<MODER13); //Set blue button as input
+
+	gpioc[PUPDR] |= PULL_UP<<PUPDR13;
+
+	volatile uint32_t * const syscfg = (volatile uint32_t *) SYSCFG_BASE;
+
+	syscfg[SYSCFG_EXTICR4] = EXTICR_CBANK<<EXTICR13; //EXTI line 13 set to bank C
+
+	volatile uint32_t * const nvic = (volatile uint32_t *) NVIC_BASE;
+
+	nvic[ISER1] |= 1<<EXTI_15_10_NVIC; //Set enable in NVIC, NVIC POS 40
+
+	exti[EXTI_IMR] = 1<<EXTI13; //Unmask in EXTI
+	exti[EXTI_FTSR] = 1<<EXTI13; //Set falling trigger
+}
+
+/*
+ * Implements simple clipping distortion on sample voltage ratio a 
+ * Parameters: unsigned int a, sample voltage in, such that 0<a<FREQ_RANGE
+ * Returns: unsigned int, sample voltage out
+ */
 unsigned int simple_distort(unsigned int a)
 {
 	if (a < FREQ_RANGE / 3)
@@ -56,7 +131,7 @@ unsigned int simple_distort(unsigned int a)
 	}
 	else if (a >= FREQ_RANGE / 3 && a < FREQ_RANGE * 2 / 3)
 	{
-	 return (( (-1*(a/455)*(a)) +12*a-FREQ_RANGE) /3);
+		return (-1*((9*a)/FREQ_RANGE)*a + 12*a  - FREQ_RANGE) / 3;
 	}
 	else 
 	{
@@ -64,29 +139,12 @@ unsigned int simple_distort(unsigned int a)
 	}
 }
 
-void blueButton_init_IT(void)
-{
-	volatile uint32_t * const rcc = (volatile uint32_t *) RCC_BASE;
-	rcc[APB2ENR] |= 1<<14; //SYSCFGEN
-	rcc[AHB1ENR] |= 1<<2; //GPIOCEN
-	
-	gpioc[MODER] &= ~(11<<MODER13);
-	gpioc[MODER] |= (INPUT<<MODER13); //Set blue buttona as input
-
-	gpioc[PUPDR] |= PULL_UP<<PUPDR13;
-
-	volatile uint32_t * const syscfg = (volatile uint32_t *) SYSCFG_BASE;
-
-	syscfg[SYSCFG_EXTICR4] = 0b0010<<4; //EXTI line 13 set to bank C
-
-	volatile uint32_t * const nvic = (volatile uint32_t *) NVIC_BASE;
-
-	nvic[ISER1] |= 1<<8; //Set enable in NVIC, NVIC POS 40
-
-	exti[EXTI_IMR] = 1<<13; //Unmask in EXTI
-	exti[EXTI_FTSR] = 1<<13; //Set falling trigger
-}
-
+/*
+ * Handles interrupts from EXTI 15-10
+ * For line 13, toggles distortion enable
+ * Parameters: None
+ * Returns: None
+ */
 void EXTI15_10_IRQHandler(void)
 {
 	//Check which interrupt fired
@@ -94,33 +152,6 @@ void EXTI15_10_IRQHandler(void)
 	if (exti[EXTI_PR]>>13 & 1) 
 	{
 		exti[EXTI_PR] = 1<<13; //clear pending interrupt
-
 		distEn ^= 1; //toggle distortion
-
 	}
 }
-
-/*
- * Main program entry
- */
- int main(void)
- {
-//	 int i = 0;
-	 adc_init(32000);
-	 dac_init();
-//	 init_usart2(BAUD_R, F_CPU);
-	 guitarIn_init();
-	 blueButton_init_IT();
-
-//	distEn = 1;
-	
-	 while (1)
-	 {
-		int sample = adc_getData();
-		if (distEn)
-		{
-			sample = simple_distort(sample);
-		}
-		dac_put(sample);
-	 } //while (1) program loop
- }

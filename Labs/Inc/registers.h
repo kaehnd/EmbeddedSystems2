@@ -17,7 +17,6 @@
 #define AHB1ENR  12
 #define APB1ENR 16
 #define APB2ENR 17
-
 #define TIM3EN 1
 
 //AHB1ENR

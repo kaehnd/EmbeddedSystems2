@@ -1,0 +1,51 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Make Firmware",
+            "type": "shell",
+            "command": "mingw32-make -j8 all TARGET=vsarm_firmware BINPATH=\"${env:VSARM}\\armcc\\bin\"; mingw32-make -j8 all TARGET=vsarm_firmware BINPATH=\"${env:VSARM}\\armcc\\bin\"",       
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+
+        {
+            "label": "Flash Firmware",
+            "type": "shell",
+            "command": "st-flash write ./build/vsarm_firmware.bin 0x08000000",       
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+
+
+        {
+            "label": "Start Serial Console",
+            "type": "shell",
+            "command": "wsl",       
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }, 
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+
+        
+    ]
+}

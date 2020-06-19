@@ -21,6 +21,7 @@
 #include "uart_driver.h"
 #include "registers.h"
 #include "irdecode.h"
+#include "irencode.h"
 
 //system values
 #define F_CPU 16000000UL
@@ -37,11 +38,19 @@
  */
  int main(void)
  {
-	init_usart2(BAUD_R, F_CPU);
-	irDecodeInit();
+	// init_usart2(BAUD_R, F_CPU);
+	// irDecodeInit();
 
-	while (1) {	
-		while(!getIRDataValid());
-		printf("%d", getIRData());
-	}
+	// while (1) {	
+	// 	while(!getIRDataValid());
+	// 	printf("%d\n", getIRData());
+	// 	setIRDataClear();
+	// }
+
+	irEncodeInit();
+	sendCode(6036);
+
+	while(1);
+
+
  }

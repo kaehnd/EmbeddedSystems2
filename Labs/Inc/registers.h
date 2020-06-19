@@ -33,6 +33,7 @@
 #define APB1ENR 16
 
 #define TIM3EN 1
+#define TIM2EN 0
 
 
 // GPIO peripherals
@@ -175,6 +176,7 @@
 
 //Timer peripheral bases
 #define TIM3_BASE 0x40000400
+#define TIM2_BASE 0x40000000
 
 
 
@@ -184,12 +186,28 @@
 #define CCER 8
 #define ARR 11
 #define CCR1 13
+#define DIER 3
+#define SR 4
+#define CNT 9
+#define PSC 10
+#define EGR 5
 
+#define APB2ENR 17
 
 
 #define NVIC_BASE 0xE000E100
 #define ISER0 0
 #define ISER1 1
+
+#define SYSCFG_BASE 0x40013800
+#define SYSCFG_EXTICR1 2
+
+#define EXTI_BASE 0x40013C00
+#define IMR 0
+#define RTSR 2
+#define FTSR 3
+#define PR 5
+
 
 #define USART_2_NVIC_POS 6
 #define ICPR0 96 //0x180 bytes, 96d 32-bit words

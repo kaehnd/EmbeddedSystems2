@@ -11,7 +11,7 @@
 #define RINGBUFFER_H_
 
 //Max length of buffer is BUF_SIZE - 1 due to get and put location extremes
-#define BUF_SIZE 50
+#define BUF_SIZE 500
 
 //Definition of RingBuffer
 typedef struct _ringBuffer {

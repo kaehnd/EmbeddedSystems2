@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "uart_driver.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "limits": "c"
     }
 }

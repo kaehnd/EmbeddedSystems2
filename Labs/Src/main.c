@@ -21,16 +21,11 @@
 #include "uart_driver.h"
 #include "registers.h"
 #include "irdecode.h"
-#include "irencode.h"
+#include "ac_send.h"
 
 //system values
 #define F_CPU 16000000UL
 #define BAUD_R 19200
-
-
-
-
-
 
 
 /*
@@ -38,19 +33,57 @@
  */
  int main(void)
  {
-	// init_usart2(BAUD_R, F_CPU);
-	// irDecodeInit();
+	init_usart2(BAUD_R, F_CPU);
+	//ac_sendCode(AC_POWER);
 
-	// while (1) {	
-	// 	while(!getIRDataValid());
-	// 	printf("%d\n", getIRData());
-	// 	setIRDataClear();
-	// }
+	while(1) {
+		printf("AC_REMOTE!");
+		char cmd[50];
+		gets(cmd);
 
-	irEncodeInit();
-	sendCode(6036);
+		if (strcmp(cmd, "power") == 0) {
 
-	while(1);
+			ac_sendCode(AC_POWER);
 
+		} else if (strcmp(cmd, "cool") == 0) {
 
+			ac_sendCode(AC_COOL);
+
+		} else if (strcmp(cmd, "fan") == 0) {
+
+			ac_sendCode(AC_FAN);
+
+		} else if (strcmp(cmd, "tempUp") == 0) {
+
+			ac_sendCode(AC_TEMP_UP);
+
+		} else if (strcmp(cmd, "tempDown")== 0) {
+
+			ac_sendCode(AC_TEMP_DOWN);
+
+		} else if (strcmp(cmd, "delayOn")==0) {
+
+			ac_sendCode(AC_DELAY_ON);
+
+		} else if (strcmp(cmd, "delayOff") == 0) {
+
+			ac_sendCode(AC_DELAY_OFF);
+
+		} else if (strcmp(cmd, "high") == 0) {
+
+			ac_sendCode(AC_HIGH);
+
+		} else if (strcmp(cmd, "low") == 0) {
+
+			ac_sendCode(AC_LOW);
+
+		} else if (strcmp(cmd, "med") == 0) {
+
+			ac_sendCode(AC_MED);
+
+		} else {
+
+			printf("oops\n\n");
+		}
+	}
  }

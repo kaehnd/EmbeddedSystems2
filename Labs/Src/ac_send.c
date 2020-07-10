@@ -8,25 +8,34 @@
  *
  *      Implements API for speaker peripheral
  */
-#define FREQUENCY 38000
-
 #include "registers.h"
-#include "speaker.h"
-#include "keypad.h"
-#include "delays.h"
 
 #include <stdint.h>
 
-static int keyCheckDelay(int millis);
 
 #define HALF_TICKS_S 8000000 //half of 16000000, the number of ticks of the clock per second
 
+//IR light send frequency; determined by sensor
+#define FREQUENCY 39000
+
+//Defines for millisecond times in signal send
 #define HDR_LOW_TIME 8222
 #define HDR_HIGH_TIME 4086
 #define SND_LOW_TIME 527
 #define SND_HIGH_TIME_1 1531
 #define SND_HIGH_TIME_0 514
 
+//IR codes
+#define AC_POWER 60368
+#define AC_COOL 60160
+#define AC_FAN 60288
+#define AC_TEMP_UP 60192
+#define AC_TEMP_DOWN 60320
+#define AC_DELAY_ON 60256
+#define AC_DELAY_OFF 60320
+#define AC_HIGH 60224
+#define AC_MED 60240
+#define AC_LOW 60304
 
 
 //register pointers
@@ -35,26 +44,47 @@ static volatile uint32_t * const timer2 = (uint32_t *) TIM2_BASE;
 static volatile uint32_t * const timer3 = (uint32_t *) TIM3_BASE;
 static volatile uint32_t * nvic = (uint32_t *) NVIC_BASE;
 
-
+//private variables
 static int sending = 0;
 static uint16_t dataToSend = 0;
 static int bitsSent = 0;
+static int initialized = 0;
 
-static void startDelay(int us);
-static void pwm_start();
-static void pwm_stop(void);
-
+//State enum
 static enum {HDR_LOW, HDR_HIGH, SND_LOW, SND_HIGH, PAUSE_LOW, PAUSE_HIGH, DONE} state;
 
 
+//Hardware helper methods
+static void startDelay(int us);
+static void pwm_start();
+static void pwm_stop(void);
+static void irEncodeInit(void);
 
-/*
- * Initialize Timer3 and GPIOB for use with speaker peripheral
- * MUST BE CALLED BEFORE ANY OTHER FUNCTION IN THIS FILE
- * Arguments: none
- * Returns: none
- */
-void irEncodeInit(void)
+//helper methods
+static void sendCode(uint16_t code);
+
+
+void ac_sendCode(uint16_t code) {
+	if (!initialized) {
+		irEncodeInit();
+	}
+	if (!sending) {
+		sendCode(code);
+	}
+}
+
+
+static void sendCode(uint16_t code) {
+	sending = 1;
+	dataToSend = code;
+	pwm_start();
+	startDelay(HDR_LOW_TIME);
+	state = HDR_LOW;
+}
+
+
+//Initialize the hardware
+static void irEncodeInit(void)
 {
 	volatile uint32_t * const rcc = (uint32_t *) RCC_BASE;
 
@@ -73,32 +103,51 @@ void irEncodeInit(void)
 	gpioc[MODER] |= ALTERNATE<<MODER6;
 
 	//Set timer output mode to toggle
-	//todo make better defines
 	timer3[CCMR1] = 0b011<<4;
 
 	//compare output enable
 	timer3[CCER] = 1;
 
+	//convert frequency to ticks, half total ticks low, half total ticks high
+	int ticks = HALF_TICKS_S / FREQUENCY;
+
+	//set ARR and CCR1 to frequency ticks
+	timer3[ARR] = ticks;
+	timer3[CCR1] = ticks;
 
     rcc[APB1ENR] |= 1<<TIM2EN;
-    timer2[PSC] = 0x0F;
+    timer2[PSC] = 0x10;
 	timer2[EGR] = 1;
 	timer2[ARR] = 0xFFFFFFFF;
 	timer2[SR] = 0;
 
+	//set up interrupt
 	timer2[DIER] = 1;
 	nvic[ISER0] |= 1<<28;
 
-	startDelay(500);
+	initialized = 1;
 }
 
-void sendCode(uint16_t code) {
-	sending = 1;
-	dataToSend = code;
+static void pwm_start()
+{
+	//enable 
+	timer3[CR1] = 1;
+	//gpioc[ODR] &= ~(1<<6);
 
-	pwm_start();
-	startDelay(HDR_LOW_TIME);
-	state = HDR_LOW;
+}
+
+static void pwm_stop(void)
+{
+	timer3[CR1] = 0;
+	//gpioc[ODR] |= 1<<6;
+}
+static void startDelay(int us) {
+	timer2[ARR] =us;
+
+	timer2[CNT] = 0;
+	timer2[DIER] = 1;
+	timer2[CR1] = 1<<3 | 1;
+
 }
 
 void TIM2_IRQHandler() {
@@ -122,12 +171,12 @@ void TIM2_IRQHandler() {
 		case SND_LOW:
 			pwm_stop();
 
-			if (dataToSend & 0x01) {
+			if (dataToSend & 0x8000) {
 				startDelay(SND_HIGH_TIME_1);
 			} else {
 				startDelay(SND_HIGH_TIME_0);
 			}
-			dataToSend >>= 1;
+			dataToSend <<= 1;
 			bitsSent++;
 
 			state = SND_HIGH;
@@ -152,37 +201,12 @@ void TIM2_IRQHandler() {
 
 			pwm_stop();
 			sending = 0;
+			bitsSent = 0;
+			dataToSend = 0;
 			break;
 
 		default: 
 			
 			break;
 	}
-}
-
-
-static void pwm_start()
-{
-	//convert frequency to ticks, half total ticks low, half total ticks high
-	int ticks = HALF_TICKS_S / FREQUENCY;
-
-	//set ARR and CCR1 to frequency ticks
-	timer3[ARR] = ticks;
-	timer3[CCR1] = ticks;
-
-	//enable 
-	timer3[CR1] = 1;
-}
-
-static void pwm_stop(void)
-{
-	timer3[CR1] = 0;
-}
-static void startDelay(int us) {
-	timer2[ARR] = us;
-
-	timer2[CNT] = 0;
-	timer2[DIER] = 1;
-	timer2[CR1] = 1<<3 | 1;
-
 }
